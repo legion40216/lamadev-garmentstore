@@ -1,5 +1,5 @@
 import EmptyState from "@/components/global-ui/empty-state";
-import ProductCard from "@/components/global-ui/product-card";
+import ProductList from "@/components/global-ui/product-list";
 import { products } from "@/data/data";
 import type { CategorySlug } from "@/schema";
 
@@ -21,11 +21,5 @@ export default function MainSection({
     return <EmptyState title="Nothing here yet" subtitle="Check back soon." />;
   }
 
-  return (
-    <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-      {visibleProducts.map((product) => (
-        <ProductCard key={product.id} product={product} />
-      ))}
-    </div>
-  );
+  return <ProductList initialData={visibleProducts} />;
 }
