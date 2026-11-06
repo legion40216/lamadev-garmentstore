@@ -1,9 +1,7 @@
-import React from 'react'
+import type { CategorySlug, FilterValue } from "@/schema";
 
-import { CategorySlug, FilterValue } from '@/schema';
-
-import ProductsCategory from '../sections/products-category'
-import CategoriesBar from '../components/categories-bar'
+import CategoriesBar from "@/components/global-ui/categories-bar";
+import ProductsCategory from "../sections/products-category";
 
 export default function ProductView({
   categoryParam,
