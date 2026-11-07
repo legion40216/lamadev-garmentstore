@@ -1,7 +1,19 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { categories } from "@/data/categories";
 import { footerLinks } from "@/data/links";
+
+// Category links come from the category list, so a new category shows up here
+// without touching links.ts (which the client-side nav also imports).
+const shopLinks = categories
+  .filter(({ slug }) => slug !== "all")
+  .map(({ name, slug }) => ({
+    href: `/products?category=${slug}`,
+    label: name,
+  }));
+
+const sections = [...footerLinks, { title: "Shop", links: shopLinks }];
 
 // `new Date()` can't run while prerendering, so the year is cached instead.
 async function CurrentYear() {
@@ -37,7 +49,7 @@ export default function Footer() {
         </div>
       </div>
 
-      {footerLinks.map((section) => (
+      {sections.map((section) => (
         <div key={section.title}>
           <h3 className="mb-2 font-semibold">{section.title}</h3>
           <ul className="space-y-1">

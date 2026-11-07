@@ -4,8 +4,11 @@ import { Heart, Minus, Plus, ShoppingCart, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
+import ColorSwatches from "@/components/global-ui/color-swatches";
+import SizeSelector from "@/components/global-ui/size-selector";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { categories } from "@/data/categories";
+import { LOW_STOCK_THRESHOLD } from "@/data/stock";
 import useProductCartLine from "@/hooks/useProductCartLine";
 import useWishlist from "@/hooks/useWishlist";
 import { cn } from "@/lib/utils";
@@ -17,12 +20,8 @@ import {
   getSizeOption,
   getStock,
   hasDiscount,
-  isColorOffered,
-  isSizeInStock,
   type Selection,
 } from "@/utils/product-variants";
-
-const LOW_STOCK_THRESHOLD = 5;
 
 interface ProductDetailsProps {
   product: ProductType;
@@ -101,85 +100,25 @@ export default function ProductDetails({
         <legend className="text-sm">
           Colour: <span className="font-medium">{color.name}</span>
         </legend>
-        <ul className="flex flex-wrap gap-3">
-          {product.colors.map((item) => {
-            const offered = isColorOffered(option, item.name);
-            const soldOut = offered && getStock(option, item.name) === 0;
-            const isSelected = item.name === color.name;
-
-            return (
-              <li key={item.name}>
-                <button
-                  type="button"
-                  disabled={!offered}
-                  aria-pressed={isSelected}
-                  aria-label={
-                    !offered
-                      ? `${item.name}, not made in size ${option.size}`
-                      : soldOut
-                        ? `${item.name}, sold out`
-                        : item.name
-                  }
-                  title={item.name}
-                  onClick={() => onSelectColor(item.name)}
-                  className={cn(
-                    "relative block size-8 overflow-hidden rounded-full border border-foreground/20 outline-none transition-opacity focus-visible:ring-2 focus-visible:ring-ring",
-                    isSelected &&
-                      "ring-2 ring-foreground ring-offset-2 ring-offset-background",
-                    !offered && "cursor-not-allowed opacity-30",
-                    soldOut && "opacity-60",
-                  )}
-                  style={{ backgroundColor: item.code }}
-                >
-                  {(!offered || soldOut) && (
-                    <span
-                      aria-hidden="true"
-                      className="absolute left-0 top-1/2 h-px w-full -rotate-45 bg-foreground/70"
-                    />
-                  )}
-                </button>
-              </li>
-            );
-          })}
-        </ul>
+        <ColorSwatches
+          colors={product.colors}
+          option={option}
+          selected={color.name}
+          onSelect={onSelectColor}
+          size="md"
+        />
       </fieldset>
 
       <fieldset className="space-y-2">
         <legend className="text-sm">
           Size: <span className="font-medium">{selection.size}</span>
         </legend>
-        <ul className="flex flex-wrap gap-2">
-          {product.sizes.map((item) => {
-            const isSelected = item.size === selection.size;
-            const soldOut = !isSizeInStock(item);
-
-            return (
-              <li key={item.size}>
-                <button
-                  type="button"
-                  aria-pressed={isSelected}
-                  aria-label={
-                    soldOut
-                      ? `Size ${item.size}, sold out`
-                      : `Size ${item.size}`
-                  }
-                  onClick={() => onSelectSize(item.size)}
-                  className={cn(
-                    "h-10 min-w-12 border px-3 text-sm tabular-nums outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring",
-                    isSelected
-                      ? "border-foreground bg-foreground text-background"
-                      : "border-border hover:border-foreground",
-                    soldOut &&
-                      !isSelected &&
-                      "text-muted-foreground line-through",
-                  )}
-                >
-                  {item.size}
-                </button>
-              </li>
-            );
-          })}
-        </ul>
+        <SizeSelector
+          sizes={product.sizes}
+          selected={selection.size}
+          onSelect={onSelectSize}
+          size="md"
+        />
       </fieldset>
 
       <p

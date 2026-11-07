@@ -16,6 +16,7 @@ import { firstParam } from "@/utils/product-url";
 import { getDefaultSelection } from "@/utils/product-variants";
 import ProductSkeleton from "../components/product-skeleton";
 import ProductSection from "../sections/product-section";
+import RelatedProducts from "../sections/related-products";
 
 export default function SingleProductView({
   product,
@@ -59,6 +60,9 @@ export default function SingleProductView({
       <Suspense fallback={<ProductSkeleton />}>
         <SelectedProduct product={product} searchParams={searchParams} />
       </Suspense>
+
+      {/* Doesn't depend on the URL, so it is part of the prerendered page. */}
+      <RelatedProducts product={product} />
     </div>
   );
 }
