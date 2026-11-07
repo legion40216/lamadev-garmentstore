@@ -1,11 +1,26 @@
 import ProductCard from "@/components/global-ui/product-card";
-import type { ProductType } from "@/types/types";
+import { cn } from "@/lib/utils";
+import type { ProductSize, ProductType } from "@/types/types";
 
 type ProductListProps = {
   initialData: ProductType[];
+  // Set when the list is filtered to one size (?size=M); cards open on it.
+  selectedSize?: ProductSize;
+  // next/image `sizes` hint, so the browser fetches the right photo width
+  cardSizes?: string;
+  // Replaces the default column layout (e.g. when the shopper picks one)
+  className?: string;
 };
 
-export default function ProductList({ initialData }: ProductListProps) {
+const DEFAULT_COLUMNS = "grid-cols-2 md:grid-cols-4";
+
+// The one product grid, shared by the homepage and the /products listing.
+export default function ProductList({
+  initialData,
+  selectedSize,
+  cardSizes,
+  className = DEFAULT_COLUMNS,
+}: ProductListProps) {
   if (initialData.length === 0) {
     return (
       <p className="py-12 text-center text-sm text-muted-foreground">
@@ -15,9 +30,14 @@ export default function ProductList({ initialData }: ProductListProps) {
   }
 
   return (
-    <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+    <div className={cn("grid gap-4", className)}>
       {initialData.map((product) => (
-        <ProductCard key={product.id} product={product} />
+        <ProductCard
+          key={product.id}
+          product={product}
+          selectedSize={selectedSize}
+          sizes={cardSizes}
+        />
       ))}
     </div>
   );
