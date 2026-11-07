@@ -1,39 +1,24 @@
-import { getValidatedSearchParams } from "@/utils/parseSearchParams";
-import { redirect } from "next/navigation";
+import { Suspense } from "react";
 
-import ProductView from "./_modules/views/product-view";
+import { resolveListingParams } from "@/utils/resolve-listing-params";
+import ProductsSkeleton from "./_modules/components/products-skeleton";
+import ProductsView from "./_modules/views/products-view";
 
-export default async function Page(props: {
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
-}) {
-  const rawSearchParams = await props.searchParams;
-  const validatedParams = getValidatedSearchParams(rawSearchParams);
-
-  // Check if we need to redirect due to invalid params
-  const rawCategory = typeof rawSearchParams.category === "string" 
-    ? rawSearchParams.category 
-    : undefined;
-  const rawFilter = typeof rawSearchParams.filter === "string"
-    ? rawSearchParams.filter
-    : undefined;
-
-  const needsRedirect = 
-    (rawCategory && rawCategory !== validatedParams.category) ||
-    (rawFilter && rawFilter !== validatedParams.filter);
-
-  if (needsRedirect) {
-    const newParams = new URLSearchParams();
-    newParams.set("category", validatedParams.category);
-    newParams.set("filter", validatedParams.filter);
-    redirect(`/?${newParams.toString()}`);
-  }
-
+export default function Page({ searchParams }: PageProps<"/products">) {
+  // The filters live in the URL, which is request-time data, so everything
+  // that reads it sits inside Suspense with a skeleton as the fallback.
   return (
-    <div>
-      <ProductView
-        categoryParam={validatedParams.category}
-        filterParam={validatedParams.filter}
-      />
-    </div>
+    <Suspense fallback={<ProductsSkeleton />}>
+      <Listing searchParams={searchParams} />
+    </Suspense>
   );
+}
+
+async function Listing({
+  searchParams,
+}: Pick<PageProps<"/products">, "searchParams">) {
+  // Unusable values (e.g. ?category=red) redirect to a clean /products URL.
+  const params = await resolveListingParams(searchParams, "/products");
+
+  return <ProductsView params={params} />;
 }
