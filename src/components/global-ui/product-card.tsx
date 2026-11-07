@@ -4,6 +4,8 @@ import { Heart, ShoppingCart, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import ColorSwatches from "@/components/global-ui/color-swatches";
+import SizeSelector from "@/components/global-ui/size-selector";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
@@ -11,9 +13,9 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { categories } from "@/data/categories";
+import { LOW_STOCK_THRESHOLD } from "@/data/stock";
 import useProductCartLine from "@/hooks/useProductCartLine";
 import useWishlist from "@/hooks/useWishlist";
-import { cn } from "@/lib/utils";
 import type { ProductSize, ProductType } from "@/types/types";
 import { formatter } from "@/utils/formatters";
 import { getProductPath } from "@/utils/product-url";
@@ -25,13 +27,9 @@ import {
   getSizeOption,
   getStock,
   hasDiscount,
-  isColorOffered,
   isProductInStock,
-  isSizeInStock,
   type Selection,
 } from "@/utils/product-variants";
-
-const LOW_STOCK_THRESHOLD = 5;
 
 interface ProductCardProps {
   product: ProductType;
@@ -165,49 +163,12 @@ export default function ProductCard({
         {/* Colour: changes the photo. Colours the current size doesn't come in
             are disabled; sold-out ones can still be looked at. */}
         <div className="flex items-center gap-2">
-          <ul className="flex flex-wrap gap-1.5" aria-label="Colour">
-            {colors.map((item) => {
-              const offered = isColorOffered(option, item.name);
-              const soldOut = offered && getStock(option, item.name) === 0;
-              const isSelected = item.name === color.name;
-
-              return (
-                <li key={item.name}>
-                  <button
-                    type="button"
-                    disabled={!offered}
-                    aria-pressed={isSelected}
-                    aria-label={
-                      !offered
-                        ? `${item.name}, not made in size ${option.size}`
-                        : soldOut
-                          ? `${item.name}, sold out`
-                          : item.name
-                    }
-                    title={item.name}
-                    onClick={() =>
-                      pick({ size: selection.size, color: item.name })
-                    }
-                    className={cn(
-                      "relative block size-5 overflow-hidden rounded-full border border-foreground/20 outline-none transition-opacity focus-visible:ring-2 focus-visible:ring-ring",
-                      isSelected &&
-                        "ring-2 ring-foreground ring-offset-2 ring-offset-background",
-                      !offered && "cursor-not-allowed opacity-30",
-                      soldOut && "opacity-60",
-                    )}
-                    style={{ backgroundColor: item.code }}
-                  >
-                    {(!offered || soldOut) && (
-                      <span
-                        aria-hidden="true"
-                        className="absolute left-0 top-1/2 h-px w-full -rotate-45 bg-foreground/70"
-                      />
-                    )}
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
+          <ColorSwatches
+            colors={colors}
+            option={option}
+            selected={color.name}
+            onSelect={(name) => pick({ size: selection.size, color: name })}
+          />
           <span className="truncate text-[11px] text-muted-foreground">
             {color.name}
           </span>
@@ -215,40 +176,11 @@ export default function ProductCard({
 
         {/* Size: sold-out sizes stay selectable (struck through) so the shopper
             can see the colour options, but they can't be added. */}
-        <ul className="flex flex-wrap gap-1" aria-label="Size">
-          {product.sizes.map((item) => {
-            const isSelected = item.size === selection.size;
-            const soldOut = !isSizeInStock(item);
-
-            return (
-              <li key={item.size}>
-                <button
-                  type="button"
-                  aria-pressed={isSelected}
-                  aria-label={
-                    soldOut
-                      ? `Size ${item.size}, sold out`
-                      : `Size ${item.size}`
-                  }
-                  onClick={() =>
-                    pick(changeSize(product, selection, item.size))
-                  }
-                  className={cn(
-                    "h-7 min-w-8 border px-1.5 text-[11px] tabular-nums outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring",
-                    isSelected
-                      ? "border-foreground bg-foreground text-background"
-                      : "border-border text-foreground hover:border-foreground",
-                    soldOut &&
-                      !isSelected &&
-                      "text-muted-foreground line-through",
-                  )}
-                >
-                  {item.size}
-                </button>
-              </li>
-            );
-          })}
-        </ul>
+        <SizeSelector
+          sizes={product.sizes}
+          selected={selection.size}
+          onSelect={(next) => pick(changeSize(product, selection, next))}
+        />
 
         <div className="mt-auto space-y-2 pt-0.5">
           <div className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-0.5">

@@ -3,7 +3,7 @@ import { type SearchParamsValues, searchParamsSchema } from "@/schema";
 export type RawSearchParams = Record<string, string | string[] | undefined>;
 
 // Repeated params (?a=1&a=2) are reduced to the last value.
-function normalizeSearchParams(
+export function normalizeSearchParams(
   searchParams: RawSearchParams,
 ): Record<string, string> {
   const result: Record<string, string> = {};

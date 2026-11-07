@@ -2,6 +2,7 @@
 // (and to the footer) once those pages are created.
 export const navLinks = [
   { href: "/", label: "Home" },
+  { href: "/products", label: "Products" },
 ];
 
 export const footerLinks = [
@@ -9,6 +10,7 @@ export const footerLinks = [
     title: "Navigation",
     links: [
       { href: "/", label: "Home" },
+      { href: "/products", label: "Products" },
     ],
   },
 ];
