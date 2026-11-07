@@ -1,8 +1,8 @@
 "use client";
 
+import { Minus, Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { Minus, Plus, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import useCart from "@/hooks/useCartStore";
@@ -37,7 +37,10 @@ export default function CheckoutItem({ item }: CheckoutItemProps) {
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <Link
-              href={getProductPath(item.slug, { size: item.size, color: item.color })}
+              href={getProductPath(item.slug, {
+                size: item.size,
+                color: item.color,
+              })}
               className="font-semibold underline-offset-4 hover:underline"
             >
               {item.name}

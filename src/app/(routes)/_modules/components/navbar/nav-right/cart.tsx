@@ -35,7 +35,9 @@ export default function Cart() {
       aria-label={`Go to checkout, ${totalCount} items in cart`}
       className="relative inline-flex size-9 items-center justify-center rounded-md transition-colors hover:bg-accent hover:text-accent-foreground"
     >
-      <ShoppingBasket className={`size-5 ${isBumping ? "animate-bounce" : ""}`} />
+      <ShoppingBasket
+        className={`size-5 ${isBumping ? "animate-bounce" : ""}`}
+      />
 
       {totalCount > 0 && (
         <span className="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-medium text-white">
